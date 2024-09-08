@@ -1,0 +1,5 @@
+-ffreestanding
+-Isrc/libs/
+-Isrc/
+-Ithirdparty/limine/
+--target=x86_64-unknown-none-elf
