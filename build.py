@@ -18,13 +18,15 @@ LFLAGS = "-m elf_x86_64"
 AFLAGS = "-f elf64"
 
 c = {
+    "src/drivers/serial.c": "build/drivers/serial.o",
     "src/drivers/vga.c": "build/drivers/vga.o",
     "src/kernel/kernel.c": "build/kernel/kernel.o",
-    "src/libs/core/memory.c": "build/libs/core/memory.o"
+    "src/libs/core/memory.c": "build/libs/core/memory.o",
+    "src/libs/core/string.c": "build/libs/core/string.o",
 }
 
 a = {
-    "src/arch/x86_64/cpu.asm": "build/cpu.o"
+    "src/arch/x86_64/kernel/cpu.asm": "build/kernel/cpu.o"
 }
 
 font_in = "thirdparty/font.psfu"
@@ -116,4 +118,4 @@ xorriso_other_flags = "--protective-ms-dos-label"
 
 check(system(f"xorriso {xorriso_filesystem_flags} {xorriso_bios_flags} {xorriso_efi_flags} {cd_root_directory} -o {cdrom}"))
 check(system(f"thirdparty/limine/limine bios-install {cdrom}"))
-check(system(f"qemu-system-x86_64 -cdrom {cdrom}"))
+check(system(f"qemu-system-x86_64 -serial stdio -cdrom {cdrom}"))

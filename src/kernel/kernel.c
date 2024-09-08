@@ -1,4 +1,6 @@
 #include <core/base.h>
+#include <core/string.h>
+#include <drivers/serial.h>
 #include <drivers/vga.h>
 
 // MARK: Bootloader
@@ -40,12 +42,29 @@ void kernel_main(void) {
     vga_init_info.bytes_per_pixel = framebuffer->bpp / 8;
     vga_init(&vga_init_info);
 
-    for (uint i = 0; i < 100; ++i) {
-        vga_put_formatted_string("scroll test %u\n", i);
+    serial_init_info serial_init_info;
+    serial_init_info.port = COM1;
+    serial_init_info.divisor = 3;
+    if (!serial_init(&serial_init_info)) {
+        vga_put_string("Failed to initialize COM1 serial port\n");
     }
 
-    vga_put_formatted_string("%d should be equal to \"-100\"\n", -100);
-    vga_put_string("time to hang?\n");
+    char buffer[256];
+    uint scroll_tests = 100;
+
+    for (uint i = 0; i < scroll_tests; ++i) {
+        string_format(buffer, "scroll test %u\n", i);
+        vga_put_string(buffer);
+    }
+
+    string_format(buffer, "%u (0x%x) lines of scroll tests completed\n", scroll_tests, scroll_tests);
+    vga_put_string(buffer);
+
+    usize length = string_format(null, "%u (0x%x) lines of scroll tests completed", scroll_tests, scroll_tests);
+    string_format(buffer, "The previous line should have %u characters (excluding the null-termination character)\n", length);
+    vga_put_string(buffer);
+
+    serial_write_string(COM1, "Kernel initialization completed\n");
 
     halt();
 }

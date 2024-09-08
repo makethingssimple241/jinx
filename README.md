@@ -1,6 +1,10 @@
 # Acknowledgements
 
-- Followed [OSDev tutorial on Limine](https://wiki.osdev.org/Limine_Bare_Bones)
+- Followed [OSDev's tutorial on Limine](https://wiki.osdev.org/Limine_Bare_Bones)
+
+- Followed [OSDev's tutorial on Serial Ports](https://wiki.osdev.org/Serial_Ports)
+
+- Referred to *The Serial Ports* of [Build your Own Operating #3](https://gayan1999malinda.medium.com/build-your-own-operating-system-2-410b1ff759ae)
 
 - Used [Limine](https://github.com/limine-bootloader/limine)
 

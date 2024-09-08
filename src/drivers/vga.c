@@ -2,8 +2,6 @@
 
 #include <core/memory.h>
 
-#include <stdarg.h>
-
 #define PSF_FONT_MAGIC  0x864ab572
 
 typedef struct {
@@ -104,73 +102,4 @@ void vga_put_string(const char *s) {
         ++s;
         vga_put_character(c);
     }
-}
-
-void vga_put_u32(u32 value, unsigned radix) {
-    char scratch_buffer[16];
-    u32 scratch_buffer_used = 0;
-
-    while (value) {
-        u32 digit = value % radix;
-        value /= radix;
-        scratch_buffer[scratch_buffer_used++] =
-            digit >= 10 ? digit - 10 + 'a' : digit + '0';
-    }
-
-    for (u32 i = scratch_buffer_used; i-- > 0;) {
-        vga_put_character(scratch_buffer[i]);
-    }
-}
-
-void vga_put_int(int signed_value, unsigned radix) {
-    bool negative = radix == 10 && signed_value < 0;
-    unsigned int value;
-
-    if (negative) {
-        vga_put_character('-');
-        value = -signed_value;
-    } else {
-        value = signed_value;
-    }
-
-    vga_put_u32(value, radix);
-}
-
-void vga_put_formatted_string_v(const char *fmt, va_list args) {
-    char c;
-    while ((c = *fmt)) {
-        ++fmt;
-
-        if (c == '%') {
-            c = *(fmt++);
-
-            switch (c) {
-            case '\0':
-                return;
-            case 'd':
-            case 'i':
-                vga_put_int(va_arg(args, int), 10);
-                break;
-            case 'u':
-                vga_put_u32(va_arg(args, unsigned int), 10);
-                break;
-            case '%':
-                vga_put_character('%');
-                break;
-            default:
-                vga_put_character('%');
-                vga_put_character(c);
-                break;
-            }
-        } else {
-            vga_put_character(c);
-        }
-    }
-}
-
-void vga_put_formatted_string(const char *fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    vga_put_formatted_string_v(fmt, args);
-    va_end(args);
 }
