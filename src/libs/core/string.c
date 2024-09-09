@@ -22,6 +22,10 @@ usize uint_to_string(char *buffer, uint value, uint radix) {
     char scratch_buffer[16];
     u32 used = 0;
 
+    if (value == 0) {
+        scratch_buffer[used++] = '0';
+    }
+
     while (value) {
         u32 digit = value % radix;
         value /= radix;
@@ -37,15 +41,15 @@ usize uint_to_string(char *buffer, uint value, uint radix) {
     return used;
 }
 
-usize string_format(char *buffer, const char *fmt, ...) {
+usize string_format(char *buffer, usize buffer_size, const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    usize used = string_format_v(buffer, fmt, args);
+    usize used = string_format_v(buffer, buffer_size, fmt, args);
     va_end(args);
     return used;
 }
 
-usize string_format_v(char *buffer, const char *fmt, va_list args) {
+usize string_format_v(char *buffer, usize buffer_size, const char *fmt, va_list args) {
     usize used = 0; 
     char c;
 
@@ -53,7 +57,7 @@ usize string_format_v(char *buffer, const char *fmt, va_list args) {
         ++fmt;
 
         if (c != '%') {
-            if (buffer) {
+            if (buffer && used < buffer_size) {
                 buffer[used++] = c;
             } else {
                 ++used;
@@ -67,17 +71,17 @@ usize string_format_v(char *buffer, const char *fmt, va_list args) {
         switch (c) {
         case 'd':
         case 'i':
-            used += int_to_string(buffer ? buffer + used : null, va_arg(args, int), 10);
+            used += int_to_string(buffer && used < buffer_size ? buffer + used : null, va_arg(args, int), 10);
             break;
         case 'u':
-            used += uint_to_string(buffer ? buffer + used : null, va_arg(args, uint), 10);
+            used += uint_to_string(buffer && used < buffer_size ? buffer + used : null, va_arg(args, uint), 10);
             break;
         case 'x':
-            used += uint_to_string(buffer ? buffer + used : null, va_arg(args, uint), 16);
+            used += uint_to_string(buffer && used < buffer_size ? buffer + used : null, va_arg(args, uint), 16);
             break;
         case '\0':
         case '%':
-            if (buffer) {
+            if (buffer && used < buffer_size) {
                 buffer[used++] = '%';
             } else {
                 ++used;
@@ -85,7 +89,7 @@ usize string_format_v(char *buffer, const char *fmt, va_list args) {
 
             break;
         default:
-            if (buffer) {
+            if (buffer && used < buffer_size) {
                 buffer[used++] = '%';
                 buffer[used++] = c;
             } else {
@@ -97,7 +101,11 @@ usize string_format_v(char *buffer, const char *fmt, va_list args) {
     }
 
     if (buffer) {
-        buffer[used] = '\0';
+        if (used < buffer_size) {
+            buffer[used] = '\0';
+        } else {
+            buffer[buffer_size - 1] = '\0';
+        }
     }
     return used;
 }

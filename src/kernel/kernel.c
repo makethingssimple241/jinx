@@ -31,15 +31,15 @@ void run_tests() {
     uint scroll_tests = 100;
 
     for (uint i = 0; i < scroll_tests; ++i) {
-        string_format(buffer, "scroll test %u\n", i);
+        string_format(buffer, 256, "scroll test %u\n", i);
         vga_put_string(buffer);
     }
 
-    string_format(buffer, "%u (0x%x) lines of scroll tests completed\n", scroll_tests, scroll_tests);
+    string_format(buffer, 256, "%u (0x%x) lines of scroll tests completed\n", scroll_tests, scroll_tests);
     vga_put_string(buffer);
 
-    usize length = string_format(null, "%u (0x%x) lines of scroll tests completed", scroll_tests, scroll_tests);
-    string_format(buffer, "The previous line should have %u characters (excluding the null-termination character)\n", length);
+    usize length = string_format(null, 256, "%u (0x%x) lines of scroll tests completed", scroll_tests, scroll_tests);
+    string_format(buffer, 256, "The previous line should have %u characters (excluding the null-termination character)\n", length);
     vga_put_string(buffer);
 
     serial_write_string(COM1, "Kernel initialization completed\n");

@@ -1,5 +1,7 @@
 #include "core/base.h"
 #include "core/memory.h"
+#include "core/string.h"
+#include "drivers/vga.h"
 
 #define IDT_MAX_ENTRIES                         256
 #define LIMINE_64_BIT_CODE_DESCRIPTOR_OFFSET    40
@@ -42,6 +44,8 @@ typedef struct packed {
 static idt_entry idt[IDT_MAX_ENTRIES];
 static idt_register idtr = {0};
 
+extern void (* isrs[32]);
+
 /// @param isr_address Address of the interrupt service routine
 static void idt_set(u8 vector, void *isr_address, idt_entry_type type, privilege_level privilege_level) {
     idt_entry *entry = &idt[vector];
@@ -56,13 +60,17 @@ static void idt_set(u8 vector, void *isr_address, idt_entry_type type, privilege
     entry->offset3 = (u64)isr_address >> 32;
 }
 
-void idt_load(const idt_register *idtr);
+void exception_handler(uint exception) {
+    char buffer[256];
+    string_format(buffer, 256, "Exception %u occured\n", exception);
+    vga_put_string(buffer);
+}
 
-void isr_exception(void);
+void idt_load(const idt_register *idtr);
 
 void idt_init(void) {
     for (u8 vector = 0; vector < 32; ++vector) {
-        idt_set(vector, isr_exception, idt_entry_type_32_bit_interrupt_gate, privilege_level_ring0);
+        idt_set(vector, isrs[vector], idt_entry_type_32_bit_interrupt_gate, privilege_level_ring0);
     }
 
     idtr.limit = sizeof(idt) - 1;
