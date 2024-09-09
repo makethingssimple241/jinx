@@ -1,6 +1,6 @@
 #include "vga.h"
 
-#include <core/memory.h>
+#include "core/memory.h"
 
 #define PSF_FONT_MAGIC  0x864ab572
 

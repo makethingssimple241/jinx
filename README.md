@@ -4,6 +4,8 @@
 
 - Followed [OSDev's tutorial on Serial Ports](https://wiki.osdev.org/Serial_Ports)
 
+- Followed [OSDev's tutorial on Interrupts](https://wiki.osdev.org/Interrupts_Tutorial)
+
 - Referred to *The Serial Ports* of [Build your Own Operating #3](https://gayan1999malinda.medium.com/build-your-own-operating-system-2-410b1ff759ae)
 
 - Used [Limine](https://github.com/limine-bootloader/limine)

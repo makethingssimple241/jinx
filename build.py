@@ -18,6 +18,8 @@ LFLAGS = "-m elf_x86_64"
 AFLAGS = "-f elf64"
 
 c = {
+    "src/arch/x86_64/kernel/arch.c": "build/kernel/arch.o",
+    "src/arch/x86_64/kernel/idt.c": "build/kernel/idt.o",
     "src/drivers/serial.c": "build/drivers/serial.o",
     "src/drivers/vga.c": "build/drivers/vga.o",
     "src/kernel/kernel.c": "build/kernel/kernel.o",
@@ -118,4 +120,11 @@ xorriso_other_flags = "--protective-ms-dos-label"
 
 check(system(f"xorriso {xorriso_filesystem_flags} {xorriso_bios_flags} {xorriso_efi_flags} {cd_root_directory} -o {cdrom}"))
 check(system(f"thirdparty/limine/limine bios-install {cdrom}"))
-check(system(f"qemu-system-x86_64 -serial stdio -cdrom {cdrom}"))
+
+# Run
+qemu_flags = f"-serial stdio -cdrom {cdrom}"
+
+if len(argv) >= 2 and argv[1] == "debug":
+    qemu_flags += " -S -s"
+
+check(system(f"qemu-system-x86_64 {qemu_flags}"))

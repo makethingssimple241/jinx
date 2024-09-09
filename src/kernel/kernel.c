@@ -1,7 +1,9 @@
-#include <core/base.h>
-#include <core/string.h>
-#include <drivers/serial.h>
-#include <drivers/vga.h>
+#include "arch.h"
+
+#include "core/base.h"
+#include "core/string.h"
+#include "drivers/serial.h"
+#include "drivers/vga.h"
 
 // MARK: Bootloader
 
@@ -24,7 +26,24 @@ static volatile LIMINE_REQUESTS_END_MARKER;
 
 // MARK: Kernel
 
-extern void halt(void);
+void run_tests() {
+    char buffer[256];
+    uint scroll_tests = 100;
+
+    for (uint i = 0; i < scroll_tests; ++i) {
+        string_format(buffer, "scroll test %u\n", i);
+        vga_put_string(buffer);
+    }
+
+    string_format(buffer, "%u (0x%x) lines of scroll tests completed\n", scroll_tests, scroll_tests);
+    vga_put_string(buffer);
+
+    usize length = string_format(null, "%u (0x%x) lines of scroll tests completed", scroll_tests, scroll_tests);
+    string_format(buffer, "The previous line should have %u characters (excluding the null-termination character)\n", length);
+    vga_put_string(buffer);
+
+    serial_write_string(COM1, "Kernel initialization completed\n");
+}
 
 void kernel_main(void) {
     if (framebuffer_request.response == null || framebuffer_request.response->framebuffer_count < 1) {
@@ -42,6 +61,8 @@ void kernel_main(void) {
     vga_init_info.bytes_per_pixel = framebuffer->bpp / 8;
     vga_init(&vga_init_info);
 
+    arch_init();
+
     serial_init_info serial_init_info;
     serial_init_info.port = COM1;
     serial_init_info.divisor = 3;
@@ -49,22 +70,6 @@ void kernel_main(void) {
         vga_put_string("Failed to initialize COM1 serial port\n");
     }
 
-    char buffer[256];
-    uint scroll_tests = 100;
-
-    for (uint i = 0; i < scroll_tests; ++i) {
-        string_format(buffer, "scroll test %u\n", i);
-        vga_put_string(buffer);
-    }
-
-    string_format(buffer, "%u (0x%x) lines of scroll tests completed\n", scroll_tests, scroll_tests);
-    vga_put_string(buffer);
-
-    usize length = string_format(null, "%u (0x%x) lines of scroll tests completed", scroll_tests, scroll_tests);
-    string_format(buffer, "The previous line should have %u characters (excluding the null-termination character)\n", length);
-    vga_put_string(buffer);
-
-    serial_write_string(COM1, "Kernel initialization completed\n");
-
+    run_tests();
     halt();
 }

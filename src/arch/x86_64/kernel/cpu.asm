@@ -17,6 +17,24 @@ in_byte:
     in      ax, dx
     ret
 
+; TODO: Identify which exception occurred
+
+; void panic(void)
+extern panic
+
+; void isr_exception(void)
+global isr_exception
+isr_exception:
+    call    panic
+    iretq
+
+; void idt_load(const idt_register *idtr)
+global idt_load
+idt_load:
+    lidt    [rdi]       ; rdi is first parameter, therefore is 'idtr'
+    sti
+    ret
+
 ; void halt(void)
 global halt
 halt:
