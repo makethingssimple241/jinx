@@ -17,13 +17,16 @@ void *memset(void *p, int value, size_t n) {
 }
 
 void *memmove(void *dest, const void *src, size_t n) {
+    byte *bdest = (byte *)dest;
+    const byte *bsrc = (byte *)src;
+
     if (src > dest) {
         for (size_t i = 0; i < n; ++i) {
-            ((byte *)dest)[i] = ((const byte *)src)[i];
+            bdest[i] = bsrc[i];
         }
     } else if (src < dest) {
         for (size_t i = n; i > 0; --i) {
-            ((byte *)dest)[i-1] = ((const byte *)src)[i-1];
+            bdest[i-1] = bsrc[i-1];
         }
     }
 

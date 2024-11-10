@@ -12,23 +12,25 @@ sub = ""
 vendor = "unknown"
 sys = "none"
 env = "elf"
-CFLAGS = f"-c -ffreestanding -g -I src/ -I src/libs/ -I thirdparty/limine/ --target={arch}{sub}-{vendor}-{sys}-{env}"
+CFLAGS = f"-c -ffreestanding -g -I src/ -I src/libs/ -I thirdparty/limine/ --target={arch}{sub}-{vendor}-{sys}-{env} -fPIC -mno-red-zone"
 
 LFLAGS = "-m elf_x86_64"
 AFLAGS = "-f elf64"
 
 c = {
-    "src/arch/x86_64/kernel/arch.c": "build/kernel/arch.o",
+    "src/arch/x86_64/drivers/pic.c": "build/drivers/pic.o",
+    "src/arch/x86_64/kernel/arch.c": "build/kernel/arch.c.o",
     "src/arch/x86_64/kernel/idt.c": "build/kernel/idt.o",
+    "src/arch/x86_64/kernel/interrupts.c": "build/kernel/interrupts.o",
     "src/drivers/serial.c": "build/drivers/serial.o",
-    "src/drivers/vga.c": "build/drivers/vga.o",
+    "src/drivers/gop.c": "build/drivers/gop.o",
     "src/kernel/kernel.c": "build/kernel/kernel.o",
     "src/libs/core/memory.c": "build/libs/core/memory.o",
     "src/libs/core/string.c": "build/libs/core/string.o",
 }
 
 a = {
-    "src/arch/x86_64/kernel/cpu.asm": "build/kernel/cpu.o"
+    "src/arch/x86_64/kernel/arch.asm": "build/kernel/arch.asm.o"
 }
 
 font_in = "thirdparty/font.psfu"
@@ -122,9 +124,14 @@ check(system(f"xorriso {xorriso_filesystem_flags} {xorriso_bios_flags} {xorriso_
 check(system(f"thirdparty/limine/limine bios-install {cdrom}"))
 
 # Run
-qemu_flags = f"-serial stdio -cdrom {cdrom}"
 
-if len(argv) >= 2 and argv[1] == "debug":
-    qemu_flags += " -S -s"
+subcommand = argv[1] if len(argv) >= 2 else None
 
-check(system(f"qemu-system-x86_64 {qemu_flags}"))
+if subcommand == "debug" or subcommand == "run":
+    qemu_flags = f"-serial stdio -cdrom {cdrom}"
+    qemu_flags += " -no-reboot -no-shutdown -M smm=off -d int"
+
+    if subcommand == "debug":
+        qemu_flags += " -S -s"
+
+    check(system(f"qemu-system-x86_64 {qemu_flags}"))

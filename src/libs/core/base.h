@@ -1,6 +1,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+typedef int8_t          i8;
+typedef int16_t         i16;
+typedef int32_t         i32;
+typedef int64_t         i64;
 typedef uint8_t         u8;
 typedef uint8_t         byte;
 typedef uint16_t        u16;
@@ -14,8 +18,13 @@ typedef unsigned int    uint;
 
 // FIXME: Different size depending on architecture?
 typedef u64             usize;
+typedef i64             isize;
 typedef usize           size_t;
+typedef isize           ssize_t;
 
+#define len(x)      sizeof(x) / sizeof((x)[0])
+// FIXME: Different definition depending on compiler?
 #define noreturn    __attribute__((noreturn))
-#define packed      __attribute__((packed))
 #define null        (void *)0
+// FIXME: Different definition depending on compiler?
+#define packed      __attribute__((packed))

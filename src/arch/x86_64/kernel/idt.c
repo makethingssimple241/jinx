@@ -1,10 +1,5 @@
 #include "core/base.h"
 #include "core/memory.h"
-#include "core/string.h"
-#include "drivers/vga.h"
-
-#define IDT_MAX_ENTRIES                         256
-#define LIMINE_64_BIT_CODE_DESCRIPTOR_OFFSET    40
 
 typedef enum {
     idt_entry_type_task_gate             = 0b0101,
@@ -21,15 +16,25 @@ typedef enum {
     privilege_level_ring3,
 } privilege_level;
 
+typedef enum : u16 {
+    gdt_descriptor_limine_null          = 0,
+    gdt_descriptor_limine_16_bit_code   = 8,
+    gdt_descriptor_limine_16_bit_data   = 16,
+    gdt_descriptor_limine_32_bit_code   = 24,
+    gdt_descriptor_limine_32_bit_data   = 32,
+    gdt_descriptor_limine_64_bit_code   = 40,
+    gdt_descriptor_limine_64_bit_data   = 48,
+} gdt_descriptor;
+
 typedef struct {
     u16 offset1;
-    u16 code_segment_selector;
-    u8 ist                          : 2;
-    u8 reserved1                    : 6;
-    idt_entry_type type             : 4;
-    bool reserved2                  : 1;
-    privilege_level privilege_level : 2;
-    bool present                    : 1;
+    gdt_descriptor code_segment_selector;
+    u8 ist                                  : 2;
+    u8 reserved1                            : 6;
+    idt_entry_type type                     : 4;
+    bool reserved2                          : 1;
+    privilege_level privilege_level         : 2;
+    bool present                            : 1;
     u16 offset2;
     u32 offset3;
     u32 reserved3;
@@ -41,18 +46,19 @@ typedef struct packed {
     u64 base;
 } idt_register;
 
-static idt_entry idt[IDT_MAX_ENTRIES];
+static idt_entry idt[256];
 static idt_register idtr = {0};
 
-extern void (* isrs[32]);
+/// @note Defined in arch.asm
+extern void (* isrs[]);
 
 /// @param isr_address Address of the interrupt service routine
-static void idt_set(u8 vector, void *isr_address, idt_entry_type type, privilege_level privilege_level) {
+static void idt_set(u16 vector, void *isr_address, idt_entry_type type, privilege_level privilege_level) {
     idt_entry *entry = &idt[vector];
     memory_set(entry, 0, sizeof(idt_entry));
 
     entry->offset1 = (u64)isr_address;
-    entry->code_segment_selector = LIMINE_64_BIT_CODE_DESCRIPTOR_OFFSET;
+    entry->code_segment_selector = gdt_descriptor_limine_64_bit_code;
     entry->type = type;
     entry->privilege_level = privilege_level;
     entry->present = true;
@@ -60,16 +66,11 @@ static void idt_set(u8 vector, void *isr_address, idt_entry_type type, privilege
     entry->offset3 = (u64)isr_address >> 32;
 }
 
-void exception_handler(uint exception) {
-    char buffer[256];
-    string_format(buffer, 256, "Exception %u occured\n", exception);
-    vga_put_string(buffer);
-}
-
+/// @note Defined in arch.asm
 void idt_load(const idt_register *idtr);
 
 void idt_init(void) {
-    for (u8 vector = 0; vector < 32; ++vector) {
+    for (u16 vector = 0; vector < 256; ++vector) {
         idt_set(vector, isrs[vector], idt_entry_type_32_bit_interrupt_gate, privilege_level_ring0);
     }
 

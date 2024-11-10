@@ -1,4 +1,5 @@
 #include "serial.h"
+#include "kernel/arch.h"
 
 #define SERIAL_DIVISOR_LOW_WHEN_DLAB_OPEN(port)     (port) + 0
 #define SERIAL_DIVISOR_HIGH_WHEN_DLAB_OPEN(port)    (port) + 1
@@ -85,9 +86,6 @@ typedef union {
     };
     u16 data;
 } line_status_register;
-
-void out_byte(u16 port, byte b);
-byte in_byte(u16 port);
 
 static bool serial_can_send_data(u16 port) {
     line_status_register line_status;
