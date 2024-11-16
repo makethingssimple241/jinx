@@ -167,10 +167,15 @@ void interrupt_handler(const interrupt_stack *stack) {
         general_protection_fault_error_code gpf;
         gpf.data = stack->error_code;
 
-        string_format(buffer, sizeof(buffer), "%s occured with error code 0b%b64 (type=\"%s\", selector=0x%x)",
-                      exception_messages[stack->interrupt],
-                      stack->error_code,
-                      general_protection_fault_selector_type_to_str(gpf.selector_type), gpf.selector);
+        char gpf_error_code_buffer[256];
+
+        if (stack->error_code != 0) {
+            string_format(gpf_error_code_buffer, sizeof(gpf_error_code_buffer), " with error code 0b%b64%s (type=\"%s\", selector=0x%x)",
+                          stack->error_code, general_protection_fault_selector_type_to_str(gpf.selector_type), gpf.selector);
+        }
+
+        string_format(buffer, sizeof(buffer), "%s occured%s",
+                      exception_messages[stack->interrupt], gpf_error_code_buffer);
     } break;
     case isr_page_fault: {
         page_fault_error_code pf;

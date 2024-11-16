@@ -1,3 +1,5 @@
+/// @brief Graphics Output Protocol driver
+
 #pragma once
 
 #include "core/base.h"

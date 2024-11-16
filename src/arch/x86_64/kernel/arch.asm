@@ -1,4 +1,6 @@
 section .text:
+    ; MARK: kernel/arch.h
+
     ; void out_byte(u16 port, byte b)
     global out_byte
     out_byte:
@@ -30,6 +32,22 @@ section .text:
     disable_interrupts:
         cli
         ret
+
+    ; void halt(void)
+    global halt
+    halt:
+        hlt
+        ret
+
+    ; MARK: idt.c
+
+    ; void idt_load(const idt_register *idtr)
+    global idt_load
+    idt_load:
+        lidt    [rdi]       ; rdi is first parameter, therefore is 'idtr'
+        ret
+
+    ; MARK: interrupts.c
 
     ; void interrupt_handler(const interrupt_stack *stack)
     extern interrupt_handler
@@ -356,19 +374,23 @@ section .text:
     isr_without_error_code  254
     isr_without_error_code  255
 
-    ; void idt_load(const idt_register *idtr)
-    global idt_load
-    idt_load:
-        lidt    [rdi]       ; rdi is first parameter, therefore is 'idtr'
-        ret
+    ; MARK: kernel/kernel.c
 
-    ; void halt(void)
-    global halt
-    halt:
-        hlt
-        ret
+    ; void main(void)
+    extern main
+
+    global entry
+    entry:
+        mov     rsp, kernel_stack_top
+        jmp     main
 
 section .bss:
+    kernel_stack_bottom:
+        resb    1048576
+    kernel_stack_top:
+
+    ; MARK: interrupts.c
+
     global isrs
     isrs:
         %assign i 0

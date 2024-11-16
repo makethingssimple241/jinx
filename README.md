@@ -76,9 +76,17 @@ Happy debugging 🎉
 
 - Referred to [*Interrupts seem to invalidate stack*](https://f.osdev.org/viewtopic.php?t=56425) of [OSDev Forum](https://f.osdev.org/)
 
+- Referred to [*For the starter*](https://wiki.osdev.org/What_Order_Should_I_Make_Things_In%3F#For_the_starter) of [OSDev's *What Order Should I Make Things In?*](https://wiki.osdev.org/What_Order_Should_I_Make_Things_In%3F)
+
+- Referred to [OSDev's *Bare Bones* tutorial](https://wiki.osdev.org/Bare_Bones)
+
 ### Other resources
 
 - Referred to *The Serial Ports* of [Build your Own Operating #3](https://gayan1999malinda.medium.com/build-your-own-operating-system-2-410b1ff759ae)
+
+- Referred to [*What's contained in 'kernel mode' in virtual address space of a process?*](https://softwareengineering.stackexchange.com/questions/420907/whats-contained-in-kernel-mode-in-virtual-address-space-of-a-process) of [Software Engineering Stack Exchange](https://softwareengineering.stackexchange.com)
+
+- Referred to [*Help setting memory paging*](https://www.reddit.com/r/osdev/comments/17o5ney/help_setting_memory_paging/) of [r/osdev](https://www.reddit.com/r/osdev/)
 
 ### Open source software used
 

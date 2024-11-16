@@ -1,28 +1,15 @@
+#include "limine_requests.h"
+
 #include "arch.h"
 
 #include "core/base.h"
 #include "core/string.h"
 #include "drivers/gop.h"
+#include "drivers/gop.h"
 #include "drivers/serial.h"
+#include "mm/pmm.h"
 
-#include <limine.h>
-
-__attribute__((used, section(".requests_start_marker")))
-static volatile LIMINE_REQUESTS_START_MARKER;
-
-__attribute__((used, section(".requests")))
-static volatile LIMINE_BASE_REVISION(2);
-
-__attribute__((used, section(".requests")))
-static volatile struct limine_framebuffer_request framebuffer_request = {
-    .id = LIMINE_FRAMEBUFFER_REQUEST,
-    .revision = 0
-};
-
-__attribute__((used, section(".requests_end_marker")))
-static volatile LIMINE_REQUESTS_END_MARKER;
-
-void run_tests() {
+void run_scroll_tests() {
     char buffer[256];
     uint scroll_tests = 100;
 
@@ -41,13 +28,15 @@ void run_tests() {
     serial_write_string(COM1, "Kernel initialization completed\n");
 }
 
-void kernel_main(void) {
-    if (!framebuffer_request.response || framebuffer_request.response->framebuffer_count < 1 || !framebuffer_request.response->framebuffers[0]->address) {
-        while (true) {}
+void main(void) {
+    char buffer[256];
+
+    struct limine_framebuffer_response *framebuffer_response = framebuffer_request.response;
+    if (!framebuffer_response || framebuffer_response->framebuffer_count < 1 || !framebuffer_request.response->framebuffers[0]->address) {
+        halt();
     }
 
-    struct limine_framebuffer *framebuffer =
-        framebuffer_request.response->framebuffers[0];
+    struct limine_framebuffer *framebuffer = framebuffer_response->framebuffers[0];
 
     gop_init_info gop_init_info = {0};
     gop_init_info.framebuffer = framebuffer->address;
@@ -64,9 +53,22 @@ void kernel_main(void) {
         panic("Failed to initialize COM1 serial port\n");
     }
 
-    arch_init();
+    struct limine_hhdm_response *hhdm_response = hhdm_request.response;
+    if (!hhdm_response) {
+        halt();
+    }
 
-    run_tests();
+    pmm_set_kernel_address_space_start(hhdm_response->offset);
+
+    struct limine_memmap_response *memory_map_response = memory_map_request.response;
+    if (!memory_map_response) {
+        halt();
+    }
+
+    arch_init();
+    pmm_init(memory_map_response);
+
+    run_scroll_tests();
 
     while (true) {
         

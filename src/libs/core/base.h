@@ -28,3 +28,7 @@ typedef isize           ssize_t;
 #define null        (void *)0
 // FIXME: Different definition depending on compiler?
 #define packed      __attribute__((packed))
+
+#define KiB         * 1024
+#define MiB         * 1024 * 1024
+#define GiB         * 1024 * 1024 * 1024

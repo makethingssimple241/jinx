@@ -12,9 +12,15 @@ sub = ""
 vendor = "unknown"
 sys = "none"
 env = "elf"
-CFLAGS = f"-c -ffreestanding -g -I src/ -I src/libs/ -I thirdparty/limine/ --target={arch}{sub}-{vendor}-{sys}-{env} -fPIC -mno-red-zone"
+CFLAGS = f"-c -ffreestanding -g -I src/ -I src/libs/ -I thirdparty/limine/ --target={arch}{sub}-{vendor}-{sys}-{env}"
+# Disable the "red zone" which makes the interrupt stack messed up
+CFLAGS += " -mno-red-zone"
+# A memory model for kernels that are loaded in the topmost 2 GiB of the address space
+CFLAGS += " -mcmodel=kernel"
+# Disable the use of SSE/AVX registers
+CFLAGS += " -mgeneral-regs-only"
 
-LFLAGS = "-m elf_x86_64"
+LFLAGS = "-m elf_x86_64 -static -Map=build/memory.map"
 AFLAGS = "-f elf64"
 
 c = {
@@ -25,6 +31,7 @@ c = {
     "src/drivers/serial.c": "build/drivers/serial.o",
     "src/drivers/gop.c": "build/drivers/gop.o",
     "src/kernel/kernel.c": "build/kernel/kernel.o",
+    "src/kernel/mm/pmm.c": "build/kernel/pmm.o",
     "src/libs/core/memory.c": "build/libs/core/memory.o",
     "src/libs/core/string.c": "build/libs/core/string.o",
 }
@@ -55,7 +62,7 @@ objects.append(font_out)
 
 print("** Making build directories")
 
-build_dirs = ["build/boot", "build/drivers", "build/kernel", "build/libs/core"]
+build_dirs = ["build/drivers", "build/kernel", "build/libs/core", "build/mm", "build/mm/arch"]
 for dir in build_dirs:
     if not exists(dir):
         makedirs(dir)

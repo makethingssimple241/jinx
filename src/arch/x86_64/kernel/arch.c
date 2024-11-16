@@ -21,11 +21,7 @@ void panic(const char *message) {
 
 void arch_init(void) {
     disable_interrupts();
-    
     idt_init();
-
     pic_init(true);
-    serial_write_string(COM1, "PIC initialized\n");
-    
     enable_interrupts();
 }
