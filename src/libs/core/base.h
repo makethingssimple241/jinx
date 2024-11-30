@@ -22,6 +22,8 @@ typedef i64             isize;
 typedef usize           size_t;
 typedef isize           ssize_t;
 
+typedef usize           physical_address;
+
 #define len(x)      sizeof(x) / sizeof((x)[0])
 // FIXME: Different definition depending on compiler?
 #define noreturn    __attribute__((noreturn))

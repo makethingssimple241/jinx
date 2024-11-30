@@ -17,14 +17,14 @@ CFLAGS = f"-c -ffreestanding -g -I src/ -I src/libs/ -I thirdparty/limine/ --tar
 CFLAGS += " -mno-red-zone"
 # A memory model for kernels that are loaded in the topmost 2 GiB of the address space
 CFLAGS += " -mcmodel=kernel"
-# Disable the use of SSE/AVX registers
-CFLAGS += " -mgeneral-regs-only"
+# Disable the use of MMX/SSE registers
+CFLAGS += " -mgeneral-regs-only -mno-mmx -mno-sse -mno-sse2"
 
 LFLAGS = "-m elf_x86_64 -static -Map=build/memory.map"
 AFLAGS = "-f elf64"
 
 c = {
-    "src/arch/x86_64/drivers/pic.c": "build/drivers/pic.o",
+    "src/arch/x86_64/drivers/i8259.c": "build/drivers/i8259.o",
     "src/arch/x86_64/kernel/arch.c": "build/kernel/arch.c.o",
     "src/arch/x86_64/kernel/idt.c": "build/kernel/idt.o",
     "src/arch/x86_64/kernel/interrupts.c": "build/kernel/interrupts.o",
@@ -32,6 +32,8 @@ c = {
     "src/drivers/gop.c": "build/drivers/gop.o",
     "src/kernel/kernel.c": "build/kernel/kernel.o",
     "src/kernel/mm/pmm.c": "build/kernel/pmm.o",
+    "src/libs/core/allocators/bitmap.c": "build/libs/core/bitmap.o",
+    "src/libs/core/assert.c": "build/libs/core/assert.o",
     "src/libs/core/memory.c": "build/libs/core/memory.o",
     "src/libs/core/string.c": "build/libs/core/string.o",
 }

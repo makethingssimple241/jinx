@@ -60,7 +60,9 @@ Happy debugging 🎉
 
 ## Acknowledgements
 
-### OSDev
+### OSDev Wiki
+
+There are lots of resources in the wiki and its forum. Below, are all of the ones that is found useful during the development of this project.
 
 - Followed [OSDev's tutorial on Limine](https://wiki.osdev.org/Limine_Bare_Bones)
 
@@ -79,6 +81,8 @@ Happy debugging 🎉
 - Referred to [*For the starter*](https://wiki.osdev.org/What_Order_Should_I_Make_Things_In%3F#For_the_starter) of [OSDev's *What Order Should I Make Things In?*](https://wiki.osdev.org/What_Order_Should_I_Make_Things_In%3F)
 
 - Referred to [OSDev's *Bare Bones* tutorial](https://wiki.osdev.org/Bare_Bones)
+
+- Referred to [*Allocating physical frames for physical memory bitmap*](https://forum.osdev.org/viewtopic.php?t=33122) of [OSDev Forum](https://forum.osdev.org/)
 
 ### Other resources
 

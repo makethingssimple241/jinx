@@ -1,6 +1,6 @@
 #include "idt.h"
 #include "kernel/arch.h"
-#include "../drivers/pic.h"
+#include "../drivers/i8259.h"
 #include "drivers/serial.h"
 #include "drivers/gop.h"
 
@@ -22,6 +22,6 @@ void panic(const char *message) {
 void arch_init(void) {
     disable_interrupts();
     idt_init();
-    pic_init(true);
+    i8259_init(true);
     enable_interrupts();
 }
